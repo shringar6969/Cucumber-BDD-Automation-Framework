@@ -1,113 +1,114 @@
 package com.cucumberFramework.stepdefinitions;
 
+import java.awt.Desktop.Action;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
 
 import com.cucumberFramework.helper.WaitHelper;
 import com.cucumberFramework.pageObjects.LoginLogoutPage;
 import com.cucumberFramework.testBase.TestBase;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-
 
 public class loginLogoutPageStepDefinitions extends TestBase {
 
 	LoginLogoutPage loginPage = new LoginLogoutPage(driver);
 	WaitHelper waitHelper = new WaitHelper(driver);
-	
+	Actions action = new Actions(driver);
+	JavascriptExecutor js = (JavascriptExecutor) driver;
+
 	@Given("^I am on the Login page URL \"([^\"]*)\"$")
 	public void i_am_on_the_Login_page_URL(String arg1) throws Throwable {
 		driver.get(arg1);
-		//waitHelper = new WaitHelper(driver);
+		driver.manage().timeouts().implicitlyWait(5000, TimeUnit.SECONDS);
+		// waitHelper = new WaitHelper(driver);
 	}
 
-	@Then("^I click on sign in button and wait for sign in page$")
-	public void i_click_on_sign_in_button_and_wait_for_sign_in_page() throws Throwable {
-		loginPage.clickSignInButton();
-		waitHelper.WaitForElement(loginPage.userName, 60);
+	@Then("^I click on \"([^\"]*)\" button$")
+	public void i_click_on_button(String arg1) throws Throwable {
+		js.executeScript("arguments[0].scrollIntoView();",loginPage.buttonType(arg1));
+		loginPage.button(arg1);
 	}
 
-	@Then("^I should see Sign In Page$")
-	public void i_should_see_Sign_In_Page() throws Throwable {
-		loginPage.userName.isDisplayed();
+	@When("^I enter registration fields$")
+	public void i_enter_registration_fields(DataTable arg1) throws Throwable {
+		List<List<String>> data = arg1.raw();
+		loginPage.enterfirstName(data.get(1).get(0));
+		loginPage.enterlastName(data.get(1).get(1));
+		loginPage.enteruserName(data.get(1).get(2));
+		loginPage.enterPassword(data.get(1).get(3));
+
+		loginPage.switchToCaptchaFrame();
+//		loginPage.clickOnCaptcha();
+		js.executeScript("arguments[0].click();", loginPage.clickOnCaptcha1());
 	}
 
-	@When("^I enter username as \"([^\"]*)\"$")
-	public void i_enter_username_as(String arg1) throws Throwable {
-		loginPage.enterUserName(arg1);
+	@When("^I enter Valid Credentials$")
+	public void i_enter_Valid_Credentials(DataTable arg1) throws Throwable {
+		List<List<String>> data = arg1.raw();
+		loginPage.enteruserName(data.get(1).get(0));
+		loginPage.enterPassword(data.get(1).get(1));
 	}
 
-	@When("^I Click on Continue button$")
-	public void i_Click_on_Continue_button() throws Throwable {
-		loginPage.clickContinueButton();
-		waitHelper.WaitForElement(loginPage.password, 60);
+	@Then("^I validate the \"([^\"]*)\" username$")
+	public void i_validate_the_username(String arg1) throws Throwable {
+		boolean username = loginPage.getprofileUsername().isDisplayed();
+		String usernameText = loginPage.profileUsername();
+		Assert.assertTrue(username);
+		Assert.assertEquals(arg1, usernameText);
+
 	}
 
-	@When("^I enter password as \"([^\"]*)\"$")
-	public void i_enter_password_as(String arg1) throws Throwable {
-		loginPage.enterPassword(arg1);
+	@Then("^I validate the invalid warning message$")
+	public void i_validate_the_invalid_warning_message() throws Throwable {
+		boolean invalid = loginPage.getInvalidWarningMsg().isDisplayed();
+		Assert.assertTrue(invalid);
 	}
 
-	@When("^click on login button$")
-	public void click_on_login_button() throws Throwable {
-		loginPage.clickLoginButton();
-	}
-	
-	@When("^I am logged in$")
-	public void i_am_already_logged_in() throws Throwable {
-	    loginPage.logoutBtn.isDisplayed();
+	@Then("^I search the \"([^\"]*)\" book$")
+	public void i_search_the_book(String arg1) throws Throwable {
+		
+		loginPage.getBookSearchField().sendKeys(arg1);
 	}
 
-	@When("^I Click on Sign out$")
-	public void i_Click_on_Sign_out() throws Throwable {
-	    loginPage.clickLogoutButton();
-	    waitHelper.WaitForElement(loginPage.userName, 60);
+	@Then("^I click on \"([^\"]*)\" book name$")
+	public void i_click_on_book_name(String bookName) throws Throwable {
+		loginPage.clickOnBookName(bookName);
 	}
 
-	@Then("^I got log out from the application and land on sign in page$")
-	public void i_got_log_out_from_the_application_and_land_on_sign_in_page() throws Throwable {
-		loginPage.userName.isDisplayed();
+	@Then("^I click on add to your collection button$")
+	public void i_click_on_add_to_your_collection_button() throws Throwable {
+		js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+	//	js.executeScript("arguments[0].click();", loginPage.getAddToYourCollectionButton());
+		loginPage.getAddToYourCollectionButton().click();
+		waitHelper.WaitForAlert(5);
+		driver.switchTo().alert().accept();
 	}
-	
-	@Then("^I choose Electronincs>Headphones and headphones list out$")
-	public void i_choose_Electronincs_Headphones_and_headphones_list_out() throws Throwable {
-	    loginPage.clickHeadphonesLnk();
+
+	@Then("^I navigate to \"([^\"]*)\"$")
+	public void i_navigate_to(String arg1) throws Throwable {
+		driver.navigate().to(arg1);
 	}
-	
-	@Then("^I add first availabe headphone to cart$")
-	public void i_add_first_availabe_headphone_to_cart() throws Throwable {
-	    loginPage.AddHeadphoneToCart();
+
+	@Then("^I validate the \"([^\"]*)\" book is added$")
+	public void i_validate_the_book_is_added(String arg1) throws Throwable {
+		Assert.assertEquals(loginPage.getBookName(arg1), arg1);
 	}
-	
-	@Then("^I search \"([^\"]*)\" and add second available item to cart$")
-	public void i_search_and_add_nd_available_item_to_cart(String arg1) throws Throwable {
-	    loginPage.enterSearchItemandAddToCart(arg1);
+
+	@Then("^I delete the added book$")
+	public void i_delete_the_added_book() throws Throwable {
+//		loginPage.getDeleteButton().click();
+//		loginPage.getDeleteOkButton().click();
+		waitHelper.WaitForAlert(5);
+		driver.switchTo().alert().accept();
 	}
-	
-	@Then("^I clear cart items if any$")
-	public void i_clear_cart_items_if_any() throws Throwable {
-	    loginPage.clearCartItemifExist();
-	}
-	
-	@Then("^I Select cart from home and remove the earlier added headphones$")
-	public void i_Select_cart_from_home_and_remove_the_earlier_added_headphones() throws Throwable {
-	    loginPage.cartButton.click();
-	    loginPage.itemList.get(1).click();
-	}
-	
-	@Then("^I Reduce the Quantity of the macbook pro product to one and proceed to checkout$")
-	public void i_Reduce_the_Quantity_of_the_macbook_pro_product_to_one_and_proceed_to_checkout() throws Throwable {
-		JavascriptExecutor js = (JavascriptExecutor)driver;
-		 js.executeScript("arguments[0].innerText='1'",driver.findElement(By.className("a-dropdown-prompt")));
-	}
-	
-	@Then("^I search different \"([^\"]*)\" from the search bar$")
-	public void i_search_different_from_the_search_bar(String arg1) throws Throwable {
-	    loginPage.itemSearchField.sendKeys(arg1);
-	    loginPage.itemSearchField.submit();
-	    Thread.sleep(5000);
-	}
-	
 }

@@ -24,4 +24,25 @@ public class WaitHelper {
 		logger.info("element is visible..");
 	}
 	
+	
+	public void WaitForFrame(WebElement element,long timeOutInSeconds){
+		logger.info("waiting for element visibilityOf..");
+		WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds);
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(element));
+		logger.info("element is visible..");
+	}
+	
+	public void WaitForClickable(WebElement element,long timeOutInSeconds){
+		logger.info("waiting for element visibilityOf..");
+		WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds);
+		wait.until(ExpectedConditions.elementToBeClickable(element)).click();
+		logger.info("element is visible..");
+	}
+	public void WaitForAlert(long timeOutInSeconds){
+		logger.info("waiting for element visibilityOf..");
+		WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds);
+		wait.until(ExpectedConditions.alertIsPresent());
+		logger.info("element is visible..");
+	}
+	
 }

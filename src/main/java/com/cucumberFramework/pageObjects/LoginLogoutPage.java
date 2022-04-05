@@ -19,14 +19,47 @@ public class LoginLogoutPage {
 	
 	private WebDriver driver;
 	
-	@FindBy(xpath="//input[@type='email']")
-	public WebElement userName;
 	
-	@FindBy(xpath="//input[@id='continue']")
-	WebElement Continue;
+	@FindBy(xpath="//input[@placeholder='First Name']")
+	WebElement firstName;
 	
-	@FindBy(xpath="//input[@type='password']")
-	public WebElement password;
+	@FindBy(xpath="//input[@placeholder='Last Name']")
+	WebElement lastName;
+	
+	@FindBy(xpath="//input[@placeholder='UserName']")
+	WebElement userName;
+	
+	@FindBy(xpath="//input[@placeholder='Password']")
+	WebElement password;
+	
+	@FindBy(xpath="//iframe[@title='reCAPTCHA']")
+	WebElement captchaFrame;
+	
+	
+	@FindBy(xpath="//div[@class='recaptcha-checkbox-border']")
+	WebElement captcha;
+	
+	@FindBy(xpath="//label[@id='userName-value']")
+	WebElement profileUsername;
+	
+	@FindBy(xpath="//p[@id='name']")
+	WebElement invalidUsernamePwd;
+	
+	
+	@FindBy(xpath="//input[@id='searchBox']")
+	WebElement getBookSearchField;
+	
+	
+	@FindBy(xpath="//div[@class='text-right fullButton']//button[@id='addNewRecordButton']")
+	WebElement addToYourCollection;
+	
+
+	@FindBy(xpath="//span[@title='Delete']")
+	WebElement deleteButton;
+	
+	@FindBy(xpath="//button[@id='closeSmallModal-ok']")
+	WebElement deleteOkButton;
+	
 	
 	@FindBy(xpath="//input[@id='signInSubmit']")
 	WebElement loginButton;
@@ -58,7 +91,6 @@ public class LoginLogoutPage {
 	@FindBy(xpath="//form[@id='activeCartViewForm']/div[@data-name='Active Items' or contains(@class,'sc-list-body')]//input[@value='Delete']")
 	public List<WebElement> itemList;
 	
-	//form[@id='activeCartViewForm']/div[@data-name='Active Items' or contains(@class,'sc-list-body')]//input[@value='Delete']
 	
 	@FindBy(xpath="//div[contains(@class,'nav-search-field')]/input")
 	public WebElement itemSearchField;
@@ -70,7 +102,19 @@ public class LoginLogoutPage {
 	public List<WebElement> qtyField;
 	
 	
+	
+	
 	WaitHelper waitHelper;
+	
+	
+	public void button(String type) {
+		driver.findElement(By.xpath("//button[text()='"+type+"']")).click();
+	}
+	
+	public WebElement buttonType(String type) {
+	return driver.findElement(By.xpath("//button[text()='"+type+"']"));
+	}
+	
 	
 	public LoginLogoutPage(WebDriver driver){
 		this.driver = driver;
@@ -79,7 +123,16 @@ public class LoginLogoutPage {
 		//waitHelper.WaitForElement(userName, 60);
 	}
 	
-	public void enterUserName(String userName){
+	
+	public void enterfirstName(String firstName){
+		this.firstName.sendKeys(firstName);
+	}
+	
+	public void enterlastName(String lastName){
+		this.lastName.sendKeys(lastName);
+	}
+	
+	public void enteruserName(String userName){
 		this.userName.sendKeys(userName);
 	}
 	
@@ -87,83 +140,56 @@ public class LoginLogoutPage {
 		this.password.sendKeys(password);
 	}
 	
-	public void clickLoginButton(){
-		loginButton.click();
+	public void switchToCaptchaFrame(){
+		waitHelper.WaitForFrame(captchaFrame, 10);
 	}
 	
-	public void enterSearchItemandAddToCart(String item){
-		String mainWindow=driver.getWindowHandle();
-		this.itemSearchField.sendKeys(item);
-		this.itemSearchField.submit();
-		secondMacbookItem.click();
-		Set<String> set =driver.getWindowHandles();
-		Iterator<String> itr= set.iterator();
-		while(itr.hasNext()){
-		 String childWindow=itr.next();
-		 if(!mainWindow.equals(childWindow)){
-			 driver.switchTo().window(childWindow);
-			 System.out.println(driver.switchTo().window(childWindow).getTitle());
-			 if(qtyField.size()>=1){
-				 
-				 Select sel = new Select(qtyField.get(0));
-				 sel.selectByValue("2");
-			 }
-			 
-			 JavascriptExecutor js = (JavascriptExecutor)driver;
-			 js.executeScript("arguments[0].scrollIntoView(true);",addToCartBtn);
-			 js.executeScript("arguments[0].click();", addToCartBtn);
-			 if(driver.findElements(By.xpath("//div[@class='a-popover-inner']//button[contains(text(),'Skip')]")).size()>=1){
-				 
-				 driver.findElements(By.xpath("//div[@class='a-popover-inner']//button[contains(text(),'Skip')]")).get(0).click();
-			 }
-			 //addToCartBtn.click();
-			 //driver.close();
-		 }
+	
+	public void clickOnCaptcha(){
+		waitHelper.WaitForClickable(captcha, 5);
+	}
+	public WebElement clickOnCaptcha1(){
+		return captcha;
+	}
+	
+	public String profileUsername(){
+	 return	profileUsername.getText();
+	}
+	
+	public WebElement getprofileUsername(){
+		 return	profileUsername;
 		}
-		driver.switchTo().window(mainWindow);
-	}
-	
-	public void clickSignInButton(){
-		Actions builder = new Actions(driver);
-		builder.moveToElement(SignInfromNav).build().perform();
-		SignInfromNav.click();
-	}
-	
-	public void clearCartItemifExist(){
-		cartButton.click();
-		int i = itemList.size();
-		if(i>=1){
-			itemList.get(0).click();
-			i = itemList.size();
+		
+	public WebElement getInvalidWarningMsg(){
+		 return	invalidUsernamePwd;
 		}
-	}
 	
-	public void clickHeadphonesLnk(){
-		Actions builder = new Actions(driver);
-		builder.moveToElement(allShopNav).build().perform();
-		builder.moveToElement(TvApplElecPanel).build().perform();
-		JavascriptExecutor js = (JavascriptExecutor)driver;
-		js.executeScript("arguments[0].click();", headPhonesCatLnk);
-		
-	}
+	public WebElement getBookSearchField(){
+		 return	getBookSearchField;
+		}
 	
-	public void AddHeadphoneToCart(){
-		
-		firstHeadPhoneLnk.click();
-		JavascriptExecutor js = (JavascriptExecutor)driver;
-		 js.executeScript("arguments[0].click();", addToCartBtn);
-	}
+	public WebElement getAddToYourCollectionButton(){
+		 return	addToYourCollection;
+		}
 	
-	public void clickContinueButton(){
-		Continue.click();
-	}
+	public void clickOnBookName(String bookname){
+		driver.findElement(By.xpath("//a[text()='"+bookname+"']")).click();
+		}
+	
+	public String getBookName(String bookname){
+	 return	driver.findElement(By.xpath("//a[text()='"+bookname+"']")).getText();
+		}
+	
+
+	public WebElement getDeleteButton(){
+		 return	deleteButton;
+		}
+	
+	public WebElement getDeleteOkButton(){
+		 return	deleteOkButton;
+		}
 	
 	
 	
-	public void clickLogoutButton(){
-		Actions builder = new Actions(driver);
-		builder.moveToElement(SignInfromNav).build().perform();
-		JavascriptExecutor js = (JavascriptExecutor)driver;
-		 js.executeScript("arguments[0].click();", logoutBtn);;
-	}
+
 }

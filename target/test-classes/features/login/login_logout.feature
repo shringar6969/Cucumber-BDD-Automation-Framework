@@ -1,39 +1,69 @@
-Feature: As a Amazon user I should be able to login and logout with valid credentials
+Feature: As a book store user I should be able to login and logout with valid credentials
 
-  Scenario: Login into the application with valid credentials
-  	Given I am on the Login page URL "https://www.amazon.in/"
-    Then I click on sign in button and wait for sign in page
-    Then I should see Sign In Page
-    When I enter username as "testusername"
-    And I Click on Continue button
-    And I enter password as "testpassword"
-    And click on login button
-    Then I am logged in
-    And I clear cart items if any
-    Then I choose Electronincs>Headphones and headphones list out
-    Then I add first availabe headphone to cart
-    Then I search "Macbook pro" and add second available item to cart
-    Then I Select cart from home and remove the earlier added headphones
-    Then I Reduce the Quantity of the macbook pro product to one and proceed to checkout
-    And I Click on Sign out
-	Then I got log out from the application and land on sign in page
-   
-   
-  Scenario Outline: Searching different products after login
-    Given I am on the Login page URL "https://www.amazon.in/"
-    Then I click on sign in button and wait for sign in page
-    Then I should see Sign In Page
-    When I enter username as "testusername"
-    And I Click on Continue button
-    And I enter password as "testpassword"
-    And click on login button
-    Then I am logged in
-	And I search different "<products>" from the search bar
-		
- 	Examples:
-	 | products |
-	 | laptops  |
-	 | pendrive |
-	 | led tv   |
+  #Scenario: Login into the application & create new user
+  #Given I am on the Login page URL "https://demoqa.com/books"
+  #Then I click on "Login" button
+  #Then I click on "New User" button
+  #When I enter registration fields
+  #| Firstname | Lastname | Username | Password   |
+  #| shri      | was      | swas     | 1234testll |
+  #Then I click on "Register" button
   
-   
+   @smoketest
+  Scenario: Login into the application with valid credentials
+    Given I am on the Login page URL "https://demoqa.com/books"
+    And I click on "Login" button
+    When I enter Valid Credentials
+      | Username | Password |
+      | swasnika | 007@Shri |
+    And I click on "Login" button
+    Then I validate the "Swasnika" username
+
+ @smoketest
+  Scenario: Login into the application with invalid username credentials
+    Given I am on the Login page URL "https://demoqa.com/books"
+    And I click on "Login" button
+    When I enter Valid Credentials
+      | Username | Password |
+      | swaqq    | 007@Shri |
+    And I click on "Login" button
+    Then I validate the invalid warning message
+
+ @smoketest
+  Scenario: Login into the application with invalid password credentials
+    Given I am on the Login page URL "https://demoqa.com/books"
+    And I click on "Login" button
+    When I enter Valid Credentials
+      | Username | Password |
+      | swasnika | test123  |
+    And I click on "Login" button
+    Then I validate the invalid warning message
+
+ @smoketest
+  Scenario: Login into the application with invalid username & password credentials
+    Given I am on the Login page URL "https://demoqa.com/books"
+    And I click on "Login" button
+    When I enter Valid Credentials
+      | Username | Password |
+      | swqqqq   | test123  |
+    And I click on "Login" button
+    Then I validate the invalid warning message
+ 
+    @smoketest
+    Scenario: Login into the application with valid credentials & search a book
+    Given I am on the Login page URL "https://demoqa.com/books"
+    And I click on "Login" button
+    When I enter Valid Credentials
+      | Username | Password |
+      | swasnika | 007@Shri |
+    And I click on "Login" button
+    Then I search the "Git Pocket Guide" book
+    And I click on "Git Pocket Guide" book name
+    And I click on add to your collection button
+    Then I navigate to "https://demoqa.com/profile"
+    Then I validate the "Git Pocket Guide" book is added
+    And I click on "Delete All Books" button
+    And I click on "OK" button
+    And I delete the added book
+    And I click on "Log out" button
+  
